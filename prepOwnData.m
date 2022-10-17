@@ -1,12 +1,12 @@
 function [SignalsT,LabelsT,SignalsV,LabelsV]=prepOwnData(database,EEG,targetLength,channels)
 
 db = database;
-%% Adatok betöltése és szegmensek szétválasztása
-%Összes EEG trial egy 3D-s (csatorna,idő,trial) mátrixba összesítése
+%% Loading data and splitting segments
+%All EEG trials aggregated into a 3D (channel,time,trial) matrix
 %db = database;
 [numb_chen,pnts,trials]=size(EEG);
 
-% Trialok normál,ictal és post-ictal részekre osztása és címkék létrehozása
+% Divide trials into normal, ictal and post-ictal parts and create labels
 j=1;
 for i=1:trials-2
     EEG_ML{j} = EEG(:,1:49999,i); Labels{j} = 'n';
@@ -15,28 +15,28 @@ for i=1:trials-2
     j = j+3;
 end
 clc
-EEG_ML = EEG_ML'; Labels = Labels'; %invertálás oszlopba
+EEG_ML = EEG_ML'; Labels = Labels'; %invert to column
 
-%% Adatok szétválasztása betanítási és validálási részre(90%:10%-os arányban)
-%Random sorrend létrehozása
+%% Separation of data into training and validation (90%:10%)
+%Create random order
 numEEGs = numel(EEG_ML);
 idx = randperm(numEEGs);
 N = floor(0.9 * numEEGs);
 
-%Betanítási adatok
+%Training data
 idxTrain = idx(1:N);
 SignalsTrain = EEG_ML(idxTrain);
 LabelsTrain = Labels(idxTrain);
 
-%Validálási adatok
+%Validation data
 idxValidation = idx(N+1:end);
 SignalsValidation = EEG_ML(idxValidation);
 LabelsValidation = Labels(idxValidation);
 
-%% Tovább szakaszolás
-% A segmentSignals funkció törli azokat a szakaszokat amiket a
-% targetLength-nél rövidebbek és több egységnyi hosszú (targetLength hosszúságú) részre 
-% vágja azokat amik hoszabbak.
+%% Segmenting further
+% The segmentSignals function deletes segments that have been
+% shorter than targetLength and into segments of several units length (targetLength). 
+% cuts those that are longer.
 
 [SignalsT, LabelsT] = segSignals(SignalsTrain,LabelsTrain,targetLength,channels);
 [SignalsV, LabelsV] = segSignals(SignalsValidation,LabelsValidation,targetLength,channels);
@@ -54,7 +54,7 @@ for z=1:2
     
     fprintf("%s arányai rendezés előtt\n",name)
     summary(Labels)
-    % Osszuk őket 3 felé
+    % Divide them into 3 halves
     normS = Signals(Labels=='n');
     normL = Labels(Labels=='n');
 
@@ -64,13 +64,13 @@ for z=1:2
     postS = Signals(Labels=='p');
     postL = Labels(Labels=='p');
     
-    % az adott szegmenseket azonos számura hozni
+    % to bring the given segments to the same number
     summ = [numel(normL) numel(ictL) numel(postL)];
     
     if max(summ)-min(summ) <= min(summ)
-        %ha elég kicsi a különbség akkor minden vektort a leghoszabb 
-        %vektor méreteire bővítünk úgy hogy az elejéből akkora szeletet
-        %csípünk le és fűzünk a végére amekkora a különbség
+        %if the difference is small enough then all vectors are the most 
+        %vectors so that a slice from the beginning of the vector
+        %clipped and appended to the end as large as the difference
         normS = [normS;normS(1:max(summ)-numel(normL))];
         normL = [normL;normL(1:max(summ)-numel(normL))];
 
@@ -81,9 +81,9 @@ for z=1:2
         postL = [postL;postL(1:max(summ)-numel(postL))];
         
     elseif max(summ)-min(summ) > min(summ)
-        %ha túl nagy a mennyiségbeli különbség a vektorok között
-        %akkor annyiadszor ismételjük meg egymás után a vektort
-        %amekkora szoros különbség van közötte és a leghoszabb között
+        %if the quantitative difference between the vectors is too large
+        %then repeat the vector as many times in a row
+        %the closest difference between it and the largest
         dev = floor(max(summ)/numel(normL));
         normS = repmat(normS,dev,1);
         normL = repmat(normL,dev,1);
@@ -96,7 +96,7 @@ for z=1:2
         postS = repmat(postS,dev,1); 
         postL = repmat(postL,dev,1);
         
-        %Aztán a maradékot kiegészítjük a már korábban használt módon
+        %Then the remainder is added in the same way as before
         normS = [normS;normS(1:max(summ)-numel(normL))];
         normL = [normL;normL(1:max(summ)-numel(normL))];
 
