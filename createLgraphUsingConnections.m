@@ -1,5 +1,5 @@
-% lgraph = createLgraphUsingConnections(layers,connections) létrehoz egy réteggráfot, 
-% amelyben a réteg tömb |layers| rétegei összekapcsolódnak |connections|
+% lgraph = createLgraphUsingConnections(layers,connections) creates a layer graph, 
+% in which the layers of the layer array |layers| are connected |connections|
 
 function lgraph = createLgraphUsingConnections(layers,connections)
 
