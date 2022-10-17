@@ -9,10 +9,10 @@ for idx_ch = channels
         x = signalsIn{idx};
         y = labelsIn(idx);
 
-        % Oszlop vektorrá alakítás
+        % Column to vector conversion
         x = x(idx_ch,:)';
 
-        % Számítsa ki a jelben található targetLength-mintadarabok számát
+        % Calculate the number of targetLength samples in the signal
         numSigs = floor(length(x)/targetLength);
 
         if numSigs == 0
@@ -21,14 +21,13 @@ for idx_ch = channels
 
         x = x(1:numSigs*targetLength);
 
-        % Hozzon létre egy mátrixot annyi oszlopból, ahány targetLength jel
-        % van
+        % Create a matrix of as many columns as there are targetLength signals
         M = reshape(x,targetLength,numSigs); 
 
-        % Ismételje meg a numSigs címkét
+        % Repeat the numSigs tag
         y = repmat(y,[numSigs,1]);
 
-        % Függőlegesen összefűzve cell array-okká
+        % Vertically spliced into cell arrays
         signalsOut = [signalsOut; mat2cell(M.',ones(numSigs,1))]; 
         labelsOut = [labelsOut; cellstr(y)]; 
     end
