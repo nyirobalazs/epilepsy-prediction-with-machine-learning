@@ -1,6 +1,5 @@
-% findLayersToReplace(lgraph) megtalálja a réteggráf osztályozási rétegét 
-% és az azt megelőző megtanulható (teljesen összefüggő vagy konvolúciós) 
-% réteget.
+% findLayersToReplace(lgraph) finds the classification layer of the layer graph 
+% and the preceding learnable (fully connected or convolutional) layer.
 
 function [learnableLayer,classLayer] = findLayersToReplace(lgraph)
 
@@ -8,12 +7,12 @@ if ~isa(lgraph,'nnet.cnn.LayerGraph')
     error('Argumentumnak muszáj egy LayerGraph object-nek lennie.')
 end
 
-% Forrás-, cél- és rétegnevek beolvasása.
+% Scan source, destination and layer names.
 src = string(lgraph.Connections.Source);
 dst = string(lgraph.Connections.Destination);
 layerNames = string({lgraph.Layers.Name}');
 
-% Klasszifikációs réteg megkeresése
+% Find classification layer
 isClassificationLayer = arrayfun(@(l) ...
     (isa(l,'nnet.cnn.layer.ClassificationOutputLayer')|isa(l,'nnet.layer.ClassificationLayer')), ...
     lgraph.Layers);
@@ -23,9 +22,8 @@ if sum(isClassificationLayer) ~= 1
 end
 classLayer = lgraph.Layers(isClassificationLayer);
 
-
-% A rétegdiagramon az osztályozási rétegtől kezdve fordítva haladjon.
-% Ha a hálózat elágazik, írjon ki hibát.
+% On the layer diagram, start from the classification layer and work backwards.
+% If the network branches, write out an error.
 currentLayerIdx = find(isClassificationLayer);
 while true
     
