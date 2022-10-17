@@ -1,26 +1,24 @@
 %%%
-% A program fuuttatásához szükség van:
+% Required to run the program:
 % - Deep Learning Toolbox Model for GoogLeNet Network
 % - Wavelet Toolbox
 % - Deep Learning toolbox
-% ...kiegészítőkre
-% Továbbá hogy az összes projekt file egy könyvtárban legyen és utánna
-% nyissuk meg a main könyvtárat
+% Furthermore, all project files must be in one directory and then
+% open the main directory
 %%%
-%% Adatok betöltése
+%% Load data
 
-%betöltjük az egerekről készült EEG felvételeket
+%load the EEG recordings of the mice
 load dbNew.mat
 
-%Összes EEG trial egy 3D-s (csatorna,idő,trial) mátrixba összesítése
+%EEG trial aggregation into a 3D (channel,time,trial) matrix
 for i=1:102
     EEG(:,:,i) = db{1,i}.eeg;
 end
 
-%% Time-Frequency Reprezentáció készítése
-% tesztelési célra, hogy lássuk korrekt-e az elképzelés, egy-egy általunk
-% választott normál(~n),roham(ictal~i) és roham utáni(postictal~p)
-% szakaszon
+%% Create Time-Frequency Representation
+% for testing purposes, to see if the idea is correct, for one of our
+% normal(~n), seizure(ictal~i) and post-seizure(postictal~p) phase
 
 Fs = 1000;
 fb = cwtfilterbank('SignalLength',10000,...
@@ -49,32 +47,31 @@ set(gca,'yscale','log');shading interp;axis tight;
 title('Post-ictal');xlabel('Idő (sec)');ylabel('Frekvencia (Hz)')
 
 
-%% Adatok előkészítése
+%% Data preparation
 
-%Adatok dimenzióinak kinyerése
+%Data dimensions extraction
 [numb_chen,pnts,trials]=size(EEG);
 
-%EEG roham minták kiválasztott csatornáinak(channels) feldarabolása normál,
-%ictal és post ictal szakaszokra. Szétválasztása training és validation
-%adatokra(90-10%-os arányban),majd tovább osztása a targetLength-el
-%megyegyező méretűre
+%EEG seizure samples of selected channels are split into normal channels,
+%ictal and post ictal sections. Separation training and validation
+%data (90-10% ratio) and further division by targetLength into a uniform size
 channels = [2 6 7 9 11];
 targetLength = 5000; %leghatékonyabb az 5000-es méret
 [SignalsT,LabelsT,SignalsV,LabelsV]=prepOwnData(db,EEG,targetLength,channels);
 
-% Pillanatnyi frekvencia számítása
+% Instantaneous frequency calculation
 fs = 1000;
 instfreqTrain = cellfun(@(x)instfreq(x,fs)',SignalsT,'UniformOutput',false);
 instfreqTest = cellfun(@(x)instfreq(x,fs)',SignalsV,'UniformOutput',false);
 
-% Spektrális entrópia számítása
+% Spectral entropy calculation
 pentropyTrain = cellfun(@(x)pentropy(x,fs)',SignalsT,'UniformOutput',false);
 pentropyTest = cellfun(@(x)pentropy(x,fs)',SignalsV,'UniformOutput',false);
 
 TrainS_2 = cellfun(@(x,y)[x;y],instfreqTrain,pentropyTrain,'UniformOutput',false);
 TestS_2 = cellfun(@(x,y)[x;y],instfreqTest,pentropyTest,'UniformOutput',false);
 
-%Normalizálás
+%Normalisation
 XV = [TrainS_2{:}];
 mu = mean(XV,2);
 sg = std(XV,[],2);
@@ -85,7 +82,7 @@ XTrainSD = cellfun(@(x)(x-mu)./sg,XTrainSD,'UniformOutput',false);
 XTestSD = TestS_2;
 XTestSD = cellfun(@(x)(x-mu)./sg,XTestSD,'UniformOutput',false);
 
-%%  LSTM Network architektúra definiálása
+%% Defining LSTM Network architecture
 
 layers = [ ...
     sequenceInputLayer(2)
@@ -105,15 +102,15 @@ options = trainingOptions('adam', ...  % sztochasztikus gradiens -> sgdm
     'Verbose',false);
 
 %% Train network
-% training futás elindítása
+% training run start
 net = trainNetwork(XTrainSD,LabelsT,layers,options);
 
 %% Accuracy test
-% pontosság számolása 
+% accuracy calculation 
 trainPred = classify(net,XTrainSD);
 LSTMAccuracy = sum(trainPred == LabelsT)/numel(LabelsT)*100
 
-%konvolúciós mátrix ábrázolása
+%plot of convolution matrix
 figure
 confusionchart(LabelsT,trainPred,'ColumnSummary','Normalizált oszlopok',...
               'RowSummary','Normalizált sorok','Title','LSTM konvolúciós mátrix');
