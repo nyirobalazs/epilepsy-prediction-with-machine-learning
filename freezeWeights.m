@@ -1,5 +1,4 @@
-% nulla értékre állítja a rétegtömb rétegeinek összes paraméterének 
-% tanulási sebességét.
+% sets to zero all the parameters of the layers of the layer array learning rate.
 
 function layers = freezeWeights(layers)
 
