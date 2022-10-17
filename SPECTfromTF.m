@@ -1,13 +1,13 @@
 function SPECTfromTF(dataIn,labelsIn,parentFolder,childFolder)
    
-    % Célkönyvtár hivatkozás létrehozása
+    % Create target directory reference
     imageRoot = fullfile(parentFolder,childFolder);
 
-    % Belső változók létrehozása
+    % Create internal variables
     data = dataIn;
     labels = labelsIn;
     
-    % szegmens hossz
+    % segment length
     [~,signalLength] = size(data{1});
 
     % filterbant 
@@ -17,17 +17,17 @@ function SPECTfromTF(dataIn,labelsIn,parentFolder,childFolder)
     for ii = 1:r
         fprintf("Create spectogram from TF %d of %d...\n", ii, r)
         cfs = abs(fb.wt(data{ii}));
-        % indexelt kép RGB képpé alakítása
+        % convert indexed image to RGB image
         im = ind2rgb(im2uint8(rescale(cfs)),jet(280));
-        % kép mentési mappájának címe
+        % title of the image save folder
         imgLoc = fullfile(imageRoot,char(labels(ii)));
-        % kép neve és filekiterjeszése
+        % image name and file extension
         imFileName = strcat(char(labels(ii)),'_',num2str(ii),'.jpg');
-        % ha a kért mappa nem létezik akkor létrehoz egyet
+        % if the requested folder does not exist it will create one
         if ~exist(imgLoc , 'dir')
             mkdir(imgLoc);
         end
-        % Majd menti a képet
+        % Then save the image
         imwrite(imresize(im,[224 224]),fullfile(imgLoc,imFileName));
     end
 end
