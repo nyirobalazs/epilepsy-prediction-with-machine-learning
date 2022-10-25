@@ -1,4 +1,4 @@
-# **Epilepsy detection artificial with machine learning**
+# **Epileptic seizure prediction using machine learning**
 
 The aim of my bachelor thesis was to classify the three phases of barking seizures in mice using a convolutional neural network(CNN) and bidirectional LSTM (BiLSTM). The project has demonstrated that it is possible to quickly and accurately predict the occurrence of an epileptic seizure up to 30 minutes before the seizure, after proper wavelet decomposition for CNN and based on the calculated Instantaneous Frequency and Spectral Entropy values for BiLSTM.
 <br>
