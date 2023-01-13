@@ -7,7 +7,7 @@ The aim of my bachelor thesis was to classify the three phases of epileptic seiz
 
 ## Background
 
-Epilepsy is a disorder affecting nearly 50 million people worldwide, of whom 60-80 thousand live in our country. It is a disorder of the brain in which neurons fire synchronously, either locally or globally, when released from inhibition, triggering a seizure. This symptom not only affects their family life, relationships and work, but if left untreated, it can also threaten them daily with severe injuries - suffered during seizures - that can result in an epileptic patient being 2-3 times more likely to die prematurely than their non-epileptic peers. To make matters worse, 50-75,000 of these people die from a specific form of epilepsy - SUDEP (sudden death during a seizure) - which could be significantly reduced by daily monitoring and seizure recognition with appropriate support.
+Epilepsy is a disorder affecting nearly 50 million people worldwide. It is a disorder of the brain in which neurons fire synchronously, either locally or globally, when released from inhibition, triggering a seizure. This symptom not only affects their family life, relationships and work, but if left untreated, it can also threaten them daily with severe injuries - suffered during seizures - that can result in an epileptic patient being 2-3 times more likely to die prematurely than their non-epileptic peers. To make matters worse, 50-75,000 of these people die from a specific form of epilepsy - SUDEP (sudden death during a seizure) - which could be significantly reduced by daily monitoring and seizure recognition with appropriate support.
 
 
 ## Project
